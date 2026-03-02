@@ -1,0 +1,114 @@
+<!--
+@component
+Image.svelte — Photo/Graphic Display Component
+
+Displays images with captions and photo credits, essential for journalism.
+Supports different sizes and optional credit attribution.
+
+USAGE EXAMPLE:
+<Image
+  src="/images/city-hall.jpg"
+  alt="City Hall building at sunset"
+  caption="City Hall, where the budget vote took place Tuesday evening."
+  credit="Jane Smith / The Daily News"
+  size="large"
+/>
+-->
+<script>
+  import { asset } from '$app/paths';
+  
+  let {
+    src,                    // Required: Image source URL
+    alt,                    // Required: Alt text for accessibility
+    caption = '',           // Optional: Caption text below image
+    credit = '',            // Optional: Photo credit
+    size = 'full',          // 'full', 'large', 'medium', 'small'
+  } = $props();
+
+  // Resolve local images (those starting with /) using asset()
+  // but not external URLs (http://, https://, //, data:)
+  const resolvedSrc = $derived(
+    src.startsWith('/') && !src.startsWith('//') 
+      ? asset(src) 
+      : src
+  );
+</script>
+
+<figure class="image-figure" class:size-full={size === 'full'} class:size-large={size === 'large'} class:size-medium={size === 'medium'} class:size-small={size === 'small'}>
+  <img 
+    src={resolvedSrc} 
+    {alt} 
+    class="image"
+    loading="lazy"
+  />
+  
+  {#if caption || credit}
+    <figcaption class="caption-container">
+      {#if caption}
+        <span class="caption">{caption}</span>
+      {/if}
+      {#if credit}
+        <span class="credit">{credit}</span>
+      {/if}
+    </figcaption>
+  {/if}
+</figure>
+
+<style lang="scss">
+  @use '../styles' as *;
+
+  .image-figure {
+    margin: var(--spacing-md) 0; // Mobile-first: smaller margin
+    padding: 0;
+
+    @include tablet {
+      margin: var(--spacing-lg) 0; // Larger screens: bigger margin
+    }
+  }
+
+  // Size variants
+  .size-full {
+    width: 100%;
+  }
+
+  .size-large {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .size-medium {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .size-small {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .caption-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+
+  .caption {
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+
+  .credit {
+    font-size: var(--font-size-xs);
+    color: var(--color-medium-gray);
+    font-style: italic;
+  }
+</style>
