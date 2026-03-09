@@ -8,6 +8,10 @@ This is your page!
   import ArticleBody from '$lib/components/ArticleBody.svelte';
   import Image from '$lib/components/Image.svelte';
   import RelatedLinks from '$lib/components/RelatedLinks.svelte';
+  import RestaurantTable from '$lib/components/RestaurantTable.svelte';
+  import BigNumber from '$lib/components/BigNumber.svelte';
+import Dashboard from '$lib/components/Dashboard.svelte';
+  
 
   // Article metadata
   let headline = 'Become a force for good. Join our next class.';
@@ -20,7 +24,37 @@ This is your page!
     { headline: 'How to install, configure and use Visual Studio Code, GitHub and Copilot', href: 'https://palewi.re/docs/coding-the-news/scripts/week-1/' },
     { headline: "How to publish a website with Node.JS and GitHub Actions", href:"https://palewi.re/docs/coding-the-news/scripts/week-2/"},
   ];
+
+  let { data } = $props();
+  
+  let selectedBorough = $state("");
+
+let selectedCuisine = $state("");
+let searchQuery = $state("");
+let selectedGrade = $state("");
+
+let cuisines = $derived(
+  [...new Set(data.restaurants.map(r => r.cuisine_description))].sort()
+);
+
+let filteredRestaurants = $derived(
+  data.restaurants.filter(r => {
+    if (selectedBorough !== '' && r.boro !== selectedBorough) return false;
+    if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
+    if (searchQuery !== '' && !r.dba.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+     if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
+    return true;
+  })
+);
+
+let displayed = $derived(filteredRestaurants.slice(0, 100));
+let aGrades = $derived(filteredRestaurants.filter(r => r.grade === 'A').length);
+let bGrades = $derived(filteredRestaurants.filter(r => r.grade === 'B').length);
+let cGrades = $derived(filteredRestaurants.filter(r => r.grade === 'C').length);
+
+
 </script>
+
 
 <!-- This sets the page title in the browser tab -->
 <svelte:head>
@@ -30,7 +64,8 @@ This is your page!
 
 <!-- Your page content goes here -->
 <div class="container">
-  
+ 
+
   <!-- Article Header: Headline, byline, and publication date -->
   <ArticleHeader
     {headline}
@@ -48,6 +83,57 @@ This is your page!
 
   <!-- Article Body: The main story text with proper typography -->
   <ArticleBody>
+<div class="filters">
+  <label for="borough">Borough</label>
+  <select id="borough" bind:value={selectedBorough}>
+    <option value="">All boroughs</option>
+    <option value="Manhattan">Manhattan</option>
+    <option value="Brooklyn">Brooklyn</option>
+    <option value="Queens">Queens</option>
+    <option value="Bronx">Bronx</option>
+    <option value="Staten Island">Staten Island</option>
+  </select>
+   <label for="cuisine">Cuisine</label>
+  <select id="cuisine" bind:value={selectedCuisine}>
+    <option value="">All cuisines</option>
+    {#each cuisines as cuisine}
+      <option value={cuisine}>{cuisine}</option>
+    {/each}
+
+
+  </select>
+
+   <label for="grade">Grade</label>
+  <select id="grade" bind:value={selectedGrade}>
+    <option value="">All Grades</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+  </select>
+
+   <div>
+    <label for="search">Search by name</label>
+    <input id="search" type="text" bind:value={searchQuery} placeholder="e.g. Pizza" />
+  </div>
+
+
+</div>
+
+<Dashboard>
+  <BigNumber number={aGrades} label="A Grades"/>
+  <BigNumber number={bGrades} label="B Grades"/>
+  <BigNumber number={cGrades} label="C Grades"/>
+ 
+
+</Dashboard>
+
+
+
+
+ <RestaurantTable data={displayed} />
+    
+
+
     <p>
       At the Craig Newmark Graduate School of Journalism at the City University of New York, change is in our DNA. That comes of being born in 2006, as the digital revolution was transforming our profession in ways none of us could have imagined.
     </p>
@@ -91,11 +177,5 @@ This is your page!
     links={relatedStories}
   />
 
-</div>
 
-<style>
-  /* Styles here only apply to this page */
-  .container {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-</style>
+</div>

@@ -127,6 +127,8 @@ img {
   max-width: 100%;
   height: auto;
   display: block;
+
+  
 }
 
 /* ===========================================
@@ -137,6 +139,16 @@ img {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
+
+  
+}
+
+input[type="text"] {
+  display: block;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 }
 
 /* ===========================================
