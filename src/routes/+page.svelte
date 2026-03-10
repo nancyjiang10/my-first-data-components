@@ -9,7 +9,6 @@ This is your page!
   import Image from '$lib/components/Image.svelte';
   import RelatedLinks from '$lib/components/RelatedLinks.svelte';
   import RestaurantTable from '$lib/components/RestaurantTable.svelte';
-  import BigNumber from '$lib/components/BigNumber.svelte';
   import Dashboard from '$lib/components/Dashboard.svelte';
   
 
@@ -118,13 +117,7 @@ This is your page!
 
 </div>
 
-<Dashboard>
-  <BigNumber number={aGrades} label="A Grades"/>
-  <BigNumber number={bGrades} label="B Grades"/>
-  <BigNumber number={cGrades} label="C Grades"/>
- 
-
-</Dashboard>
+<Dashboard {aGrades} {bGrades} {cGrades} />
 
 
 

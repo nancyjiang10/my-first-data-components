@@ -1,9 +1,13 @@
 <script>
-  let { children } = $props();
+  import BigNumber from '$lib/components/BigNumber.svelte';
+
+  let { aGrades = 0, bGrades = 0, cGrades = 0 } = $props();
 </script>
 
 <div class="row">
-  {@render children()}
+  <BigNumber number={aGrades} label="A Grades" />
+  <BigNumber number={bGrades} label="B Grades" />
+  <BigNumber number={cGrades} label="C Grades" />
 </div>
 
 <style>
