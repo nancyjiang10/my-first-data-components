@@ -10,7 +10,7 @@ This is your page!
   import RelatedLinks from '$lib/components/RelatedLinks.svelte';
   import RestaurantTable from '$lib/components/RestaurantTable.svelte';
   import BigNumber from '$lib/components/BigNumber.svelte';
-import Dashboard from '$lib/components/Dashboard.svelte';
+  import Dashboard from '$lib/components/Dashboard.svelte';
   
 
   // Article metadata
@@ -26,31 +26,30 @@ import Dashboard from '$lib/components/Dashboard.svelte';
   ];
 
   let { data } = $props();
-  
+
   let selectedBorough = $state("");
+  let selectedCuisine = $state("");
+  let searchQuery = $state("");
+  let selectedGrade = $state("");
 
-let selectedCuisine = $state("");
-let searchQuery = $state("");
-let selectedGrade = $state("");
+  let cuisines = $derived(
+    [...new Set(data.restaurants.map((r) => r.cuisine_description))].sort()
+  );
 
-let cuisines = $derived(
-  [...new Set(data.restaurants.map(r => r.cuisine_description))].sort()
-);
+  let filteredRestaurants = $derived(
+    data.restaurants.filter((r) => {
+      if (selectedBorough !== '' && r.boro !== selectedBorough) return false;
+      if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
+      if (searchQuery !== '' && !r.dba.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
+      return true;
+    })
+  );
 
-let filteredRestaurants = $derived(
-  data.restaurants.filter(r => {
-    if (selectedBorough !== '' && r.boro !== selectedBorough) return false;
-    if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
-    if (searchQuery !== '' && !r.dba.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-     if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
-    return true;
-  })
-);
-
-let displayed = $derived(filteredRestaurants.slice(0, 100));
-let aGrades = $derived(filteredRestaurants.filter(r => r.grade === 'A').length);
-let bGrades = $derived(filteredRestaurants.filter(r => r.grade === 'B').length);
-let cGrades = $derived(filteredRestaurants.filter(r => r.grade === 'C').length);
+  let displayed = $derived(filteredRestaurants.slice(0, 100));
+  let aGrades = $derived(filteredRestaurants.filter((r) => r.grade === 'A').length);
+  let bGrades = $derived(filteredRestaurants.filter((r) => r.grade === 'B').length);
+  let cGrades = $derived(filteredRestaurants.filter((r) => r.grade === 'C').length);
 
 
 </script>
